@@ -22,6 +22,21 @@ public:
     unordered_map<string, Operator> operators;
     unordered_map<string, Tensor> tensors;
 };
+
+int earextime(Operator* node, unordered_map<Operator*, int> &memo){
+    if(memo.find(node) != memo.end()){
+        return memo[node];
+    }
+    int maxtime=0;
+    for(Tensor* input: node->inputs){
+        if(input->producer != nullptr){
+            int time= earextime(input->producer, memo);
+            maxtime= max(maxtime, time);
+        }
+    }
+    memo[node]= maxtime + node->runtime;
+    return memo[node];
+}
 int main(){
     Graph graph;
     //1st operator
@@ -115,6 +130,7 @@ int main(){
     f.consumers.push_back(&n8);
     bias.consumers.push_back(&n8);
     y.producer = &n8;
-
+    
+    unordered_map<Operator*, int> memo;
     return 0;
 }
