@@ -1,5 +1,15 @@
 #include<bits/stdc++.h>
 using namespace std;
+vector<int> seqprefixsum(const vector<int> &arr){
+    int n= arr.size();
+    if(n==0) return {};
+    vector<int> pref(n); 
+    pref[0]= arr[0];
+    for(int i=1; i<n; i++){
+        pref[i] = pref[i-1]+ arr[i];
+    }
+    return pref;
+}
 
 int next2power(int n){
     int p=1;
@@ -65,9 +75,16 @@ void pardownsweep(vector<int> &fillarr){
 }
 int main(){
     vector<int> arr= {1,2,3,4,5};
+    
     //parallel prefix sum execution
     vector<int> fillarr= fillarray(arr);
 
+    auto start1= chrono::high_resolution_clock::now();
+    vector<int> seqsum= seqprefixsum(arr);
+    auto end1= chrono::high_resolution_clock::now();
+    double seqtime = chrono::duration<double, milli>(end1-start1).count();
+
+    auto start2= chrono::high_resolution_clock::now();
     //upsweep at each level
     parupsweep(fillarr);
     //downsweep at each level
@@ -76,7 +93,10 @@ int main(){
     for(int i=0; i<arr.size(); i++){
         parsum[i]= fillarr[i]+ arr[i];
     }
-    
-    for(auto x: parsum) cout<< x<<" ";
+    auto end2= chrono::high_resolution_clock::now();
+    double partime = chrono::duration<double, milli>(end2-start2).count();
+
+    cout<<"Time for sequential execution  "<<" : "<< seqtime<<" ms"<<'\n';
+    cout<<"Time for parallel execution "<<" : "<< partime<<" ms"<<'\n';
     return 0;
 }
